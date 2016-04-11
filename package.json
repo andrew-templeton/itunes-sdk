@@ -1,0 +1,36 @@
+{
+  "name": "itunes-sdk",
+  "version": "0.1.0",
+  "description": "iTunes SDK for nodejs",
+  "license": "MIT",
+  "repository": "https://github.com/andrew-templeton/itunes-sdk",
+  "author": {
+    "name": "Andrew Templeton",
+    "email": "andrw.tmplton@gmail.com",
+    "url": "http://twitter.com/ayetempleton"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+  },
+  "files": [
+    "index.js",
+    "lib"
+  ],
+  "keywords": [
+    "itunes",
+    "mac",
+    "osx",
+    "remote",
+    "Music",
+    "SDK",
+    "OS X"
+  ],
+  "dependencies": {
+    "osascript": "1.2.0",
+    "require-dir": "0.3.0"
+  },
+  "devDependencies": {
+  }
+}
