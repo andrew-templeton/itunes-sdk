@@ -10,29 +10,46 @@ var OSA_SCRIPT_SETTINGS = {
 
 module.exports = ScriptOut;
 
-function ScriptOut(script, opts, callback) {
-	if ('function' != callback && 'function' == typeof opts) {
-		callback = opts;
-		opts = {};
-	}
-	callback = callback || function() {};
-	opts = opts || {};
+function inputPackager(mappings) {
+	return function(argVals) {
+		var args = [].slice.call(argVals);
+		var callback = args.pop();
+		var opts = (mappings || []).reduce(function(hash, key, index) {
+			hash[key] = args[index] || null;
+			return hash;
+		}, {});
+		return {
+			callback: callback || noop,
+			opts: opts
+		};
+	};
+}
 
-	executable = SerializeFunction(Scripts[script], opts);
+function noop() {
+}
 
-	console.log('Calling: ', script);
-	console.log('Options: ', opts);
+function ScriptOut(script, mappings) {
+	var getInput = inputPackager(mappings);
+	return function ScriptFunctor() {
+		var input = getInput(arguments);
 
-	osascript(executable, OSA_SCRIPT_SETTINGS, function (err, data) {
-		var result;
-		if (err) {
-			console.error(err);
-			return callback(err);
-		}
-		try {
-			return callback(null, JSON.parse(data));
-		} catch (err) {
-			return callback(null, data);
-		}
-	});
+		executable = SerializeFunction(Scripts[script], input.opts);
+
+		console.log('Calling: ', script);
+		console.log('Options: ', input.opts);
+
+		osascript(executable, OSA_SCRIPT_SETTINGS, function (err, data) {
+			var result;
+			if (err) {
+				console.error(err);
+				return input.callback(err);
+			}
+			try {
+				result = JSON.parse(data);
+			} catch (err) {
+				result = data;
+			}
+			input.callback(null, result);
+		});
+	};
 }

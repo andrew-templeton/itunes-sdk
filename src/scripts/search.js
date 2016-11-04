@@ -1,42 +1,13 @@
 module.exports = function (app, inputs) {
-	var playlistName = 'itunes-remote';
-	var app = Application('iTunes');
-	var searchTerm = inputs.searchTerm;
-	var library = app.libraryPlaylists[0];
-	var result;
-	var list;
-
-	result = app.search(library, {
-		for: searchTerm,
-		only: inputs.limitTo
-	});
-
-	try {
-		app.userPlaylists[playlistName]();
-	} catch (e) {
-		console.log('create playlist');
-		app.make({
-			new: 'playlist',
-			withProperties: {
-				name: playlistName
-			}
-		});
+	var playlistReference;
+	var playlistPersistentId = inputs.playlist && inputs.playlist.persistentID;
+	if (playlistPersistentId) {
+		playlistReference = app.playlists.whose({persistentID: playlistPersistentId});
 	}
-
-	list = app.userPlaylists[playlistName];
-
-	app.delete(list.tracks);
-
-	result.forEach(function (element) {
-		app.duplicate(element, {
-			to: list
-		});
-	});
-
-	console.log(list.time());
-
-	return {
-		playlistName: playlistName,
-		playlistLength: result.length
-	};
+	return JSON.parse(JSON.stringify(app.search(playlistPersistentId || app.libraryPlaylists[0], {
+		for: inputs.query,
+		only: inputs.type || 'all'
+	}).map(function(thing) {
+		return thing.properties();
+	})));
 };

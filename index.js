@@ -1,78 +1,83 @@
 var ScriptOut = require('./src/script-out');
 
-function playTrack(thing, callback) {
-	ScriptOut('playTrack', {specifier: thing}, callback);
-}
-
-function stopPlayback(callback) {
-	ScriptOut('stop', callback);
-}
-
-function pausePlayback(callback) {
-	ScriptOut('pause', callback);
-}
-
-function nextTrack(callback) {
-	ScriptOut('next', callback);
-}
-
-function prevTrack(callback) {
-	ScriptOut('previous', callback);
-}
-
-function backTrack(callback) {
-	ScriptOut('back', callback);
-}
-
-function search(searchTerm, opts, callback) {
-	ScriptOut('search', {
-		limitTo: opts.limitTo || 'all',
-		searchTerm: opts.searchTerm || '*'
-	}, callback);
-}
-
-function getData(callback) {
-	ScriptOut('getLibraryData', callback);
-}
-
-function debug(callback) {
-	ScriptOut('debug', callback);
-}
-
-function setVolume(volume, callback) {
-	ScriptOut('setVolume', {volume: volume}, callback);
-}
-
-function getVolume(callback) {
-	ScriptOut('getVolume', callback);
-}
-
-
 function adjustVolume(delta, callback) {
 	iTunes.getVolume(function(err, volume) {
+		console.log('Found volume: ', volume);
+		console.log('Delta volume: ', delta);
 		var newVolume = Math.min(100, Math.max(0, volume + delta));
 		iTunes.setVolume(newVolume, callback);	
 	});
 }
 
-function currentTrack(callback) {
-	ScriptOut('currentTrack', callback);
+function playSearch(search, playlist, callback) {
+	iTunes.search(search, null, null, function(err, results) {
+		if (err) {
+			console.error(err);
+			return callback(err);
+		}
+		var playlistName = playlist || 'iTunes SDK Playlist';
+		console.log('Putting a playlist: ' + playlistName);
+		iTunes.putPlaylist(playlistName, function(err, list) {
+			if (err) {
+				console.error(err);
+				return callback(err);
+			}
+			if (!results.length) {
+				var msg = 'No tracks found.';
+				console.error(msg);
+				return callback(msg);
+			}
+			console.log('Adding a single track first...');
+			iTunes.putTracks(list.persistentID, [persistentID(results.shift())], function(err) {
+				if (err) {
+					console.error(err);
+					return callback(err);
+				}
+				console.log('Playing the single track playlist before adding more...');
+				iTunes.playPlaylist(list.persistentID, function(err) {
+					if (err) {
+						var msg = 'Could not start playlist.';
+						console.error(msg);
+						return callback(msg);
+					}
+					if (!results.length) {
+						return callback();
+					}
+					console.log('Proceeding with other track additions...');
+					iTunes.putTracks(list.persistentID, results.map(persistentID), callback);
+				});
+			});
+		});
+	});
+}
+
+function persistentID(obj) {
+	return obj.persistentID;
 }
 
 var iTunes = {
-	playTrack: playTrack,
-	stop: stopPlayback,
-	pause: pausePlayback,
-	next: nextTrack,
-	previous: prevTrack,
-	back: backTrack,
-	search: search,
-	getData: getData,
-	debug: debug,
-	currentTrack: currentTrack,
-	setVolume: setVolume,
-	getVolume: getVolume,
-	adjustVolume: adjustVolume
+	adjustVolume: adjustVolume,
+	back: ScriptOut('back'),
+	currentTrack: ScriptOut('currentTrack'),
+	debug: ScriptOut('debug'),
+	getData: ScriptOut('getLibraryData'),
+	getDevices: ScriptOut('getDevices'),
+	getVolume: ScriptOut('getVolume'),
+	listPlaylists: ScriptOut('listPlaylists'),
+	next: ScriptOut('next'),
+	pause: ScriptOut('pause'),
+	play: ScriptOut('play'),
+	playerState: ScriptOut('playerState'),
+	playPlaylist: ScriptOut('playPlaylist', ['playlistId']),
+	playSearch: playSearch,
+	playTrack: ScriptOut('playTrack', ['specifier']),
+	previous: ScriptOut('previous'),
+	putPlaylist: ScriptOut('putPlaylist', ['name']),
+	putTracks: ScriptOut('putTracks', ['playlistId', 'trackIds']),
+	search: ScriptOut('search', ['query', 'type', 'playlist']),
+	setDevice: ScriptOut('setDevice', ['device']),
+	setVolume: ScriptOut('setVolume', ['volume']),
+	stop: ScriptOut('stop')
 };
 
 module.exports = iTunes;
