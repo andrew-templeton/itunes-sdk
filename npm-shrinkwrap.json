@@ -1,0 +1,23 @@
+{
+  "name": "itunes-sdk",
+  "version": "0.1.0",
+  "dependencies": {
+    "osascript": {
+      "version": "1.2.0",
+      "from": "osascript@1.2.0",
+      "resolved": "https://registry.npmjs.org/osascript/-/osascript-1.2.0.tgz",
+      "dependencies": {
+        "duplex-child-process": {
+          "version": "0.0.5",
+          "from": "duplex-child-process@0.0.5",
+          "resolved": "https://registry.npmjs.org/duplex-child-process/-/duplex-child-process-0.0.5.tgz"
+        }
+      }
+    },
+    "require-dir": {
+      "version": "0.3.0",
+      "from": "require-dir@0.3.0",
+      "resolved": "https://registry.npmjs.org/require-dir/-/require-dir-0.3.0.tgz"
+    }
+  }
+}

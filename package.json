@@ -3,17 +3,15 @@
   "version": "0.1.0",
   "description": "iTunes SDK for nodejs",
   "license": "MIT",
-  "repository": "https://github.com/andrew-templeton/itunes-sdk",
-  "author": {
-    "name": "Andrew Templeton",
-    "email": "andrw.tmplton@gmail.com",
-    "url": "http://twitter.com/ayetempleton"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrew-templeton/itunes-sdk.git"
   },
+  "author": "Andrew Templeton <andrw.tmplton@gmail.com> (http://twitter.com/ayetempleton)",
   "engines": {
     "node": ">=0.10.0"
   },
-  "scripts": {
-  },
+  "scripts": {},
   "files": [
     "index.js",
     "lib"
@@ -31,6 +29,10 @@
     "osascript": "1.2.0",
     "require-dir": "0.3.0"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {},
+  "bugs": {
+    "url": "https://github.com/andrew-templeton/itunes-sdk/issues"
+  },
+  "homepage": "https://github.com/andrew-templeton/itunes-sdk#readme",
+  "main": "index.js"
 }
